@@ -1,0 +1,45 @@
+name: Reusable linting workflow
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Do some upgrades of packages that have security fixes available -- this should eventually be moved to a container
+      - name: upgrade packages
+        run: |
+          pip install urllib3  --upgrade # 1.26.5
+          pip install twisted  --upgrade # 22.4.0rc1
+          pip install pyyaml  --upgrade # 5.4
+          pip install pyjwt  --upgrade # 2.4.0
+          pip install pip  --upgrade # 21.1
+          pip install jinja2  --upgrade # 2.11.3
+          pip install httplib2  --upgrade # 0.19.0
+          pip install cryptography --upgrade # 3.3.2
+          
+      # Install required python packages -- this should eventually be moved to a container
+      - name: Install Python Packages
+        run: pip install bandit safety rdk rdklib checkov
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        
+      # RDK unit testing
+      - name: RDK unit testing
+        run: rdk test-local --all
+              
+      # Python linting
+      - name: Python Bandit
+        run: python -m bandit -v -r .
+        
+      - name: Python Safety
+        run: safety check
+          
+      # Terraform (and CloudFormation) linting
+      - name: Checkov
+        run: checkov --directory .
