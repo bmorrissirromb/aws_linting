@@ -24,14 +24,14 @@ jobs:
           
       # Install required python packages -- this should eventually be moved to a container
       - name: Install Python Packages
-        run: pip install bandit safety rdk rdklib checkov
+        run: pip install bandit safety checkov # rdk rdklib
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
         
-      # RDK unit testing
-      - name: RDK unit testing
-        run: rdk test-local --all
+#       # RDK unit testing - Commented out since not all repos will contain this
+#       - name: RDK unit testing
+#         run: rdk test-local --all
               
       # Python linting
       - name: Python Bandit
